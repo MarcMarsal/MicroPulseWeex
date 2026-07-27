@@ -14,7 +14,7 @@ async function getMarketState() {
   try {
     const q = await client.query(`
       SELECT open, high, low, close, volume
-      FROM candles
+      FROM candles_weex
       WHERE symbol='BTC-USDT' AND timeframe='1H'
       ORDER BY timestamp DESC
       LIMIT 24
@@ -77,7 +77,7 @@ async function getActiveSignals() {
       date_es,
       hora_es,
       created_at
-    FROM signals_upgraded
+    FROM signals_weex
     ORDER BY created_at DESC
     LIMIT 20
   `);
@@ -194,10 +194,10 @@ async function startPanel() {
     }
 
     res.writeHead(200);
-    res.end("Panell FIAT‑PRO OK");
+    res.end("Panell MicroPulseWeex OK");
   }).listen(process.env.PORT || 3000);
 
-  console.log("Panell Microimpulsos FIAT‑PRO en marxa");
+  console.log("Panell MicroPulseWeex en marxa");
 }
 
 startPanel();
