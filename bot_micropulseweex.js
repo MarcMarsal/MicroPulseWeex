@@ -79,7 +79,7 @@ async function getCandlesFromDB(symbol, timeframe, limit, untilTimestamp = null)
   if (untilTimestamp === null) {
     const res = await client.query(`
       SELECT *
-      FROM candles
+      FROM candles_weex
       WHERE symbol = $1 AND timeframe = $2
       ORDER BY timestamp DESC
       LIMIT $3
@@ -92,7 +92,7 @@ async function getCandlesFromDB(symbol, timeframe, limit, untilTimestamp = null)
 
   const res = await client.query(`
     SELECT *
-    FROM candles
+    FROM candles_weex
     WHERE symbol = $1 AND timeframe = $2
     AND timestamp <= $3
     ORDERORDER BY timestamp DESC
@@ -208,7 +208,7 @@ export async function processSymbol(symbol, timeframe) {
     // -------------------------------------------------------------
     const q = await client.query(`
       SELECT close
-      FROM candles
+      FROM candles_weex
       WHERE symbol=$1 AND timeframe=$2
       ORDER BY timestamp DESC
       LIMIT 15
