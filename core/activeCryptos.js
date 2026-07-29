@@ -15,3 +15,50 @@ export const UNIVERSE = [
   "AVAX-USDT","BCH-USDT","HBAR-USDT","NEAR-USDT","SEI-USDT","SUI-USDT",
   "VIRTUAL-USDT","LTC-USDT"
 ];
+
+// -------------------------------------------------------------
+// DECIMALS PER SIMBOL (FIAT)
+// -------------------------------------------------------------
+export const DECIMALS = {
+  "ADA-USDT": 4,
+  "APT-USDT": 4,
+  "ARB-USDT": 5,
+  "ASTER-USDT": 4,
+  "ATOM-USDT": 3,
+  "AVAX-USDT": 3,
+  "BCH-USDT": 2,
+  "BNB-USDT": 2,
+  "BTC-USDT": 1,
+  
+  "DOT-USDT": 4,
+
+  "ETH-USDT": 2,
+  "FET-USDT": 4,
+  "HBAR-USDT": 5,
+  "INJ-USDT": 3,
+  "LINK-USDT": 3,
+  "LTC-USDT": 2,
+  "OP-USDT": 4,
+   
+  "PEPE-USDT": 7,
+   
+  
+  "NEAR-USDT": 3,
+  "RENDER-USDT": 3,
+  "SEI-USDT": 5,
+  "SOL-USDT": 2,
+  "SUI-USDT": 4,
+  
+  
+  "TRUMP-USDT": 3,
+  "VIRTUAL-USDT": 4,
+  "XRP-USDT": 4 
+};
+
+// -------------------------------------------------------------
+// FORMATAR NÚMEROS SEGONS EL SIMBOL
+// -------------------------------------------------------------
+export function fmt(n, symbol) {
+  const d = DECIMALS[symbol] ?? 4;
+  return Number(n).toFixed(d);
+}
