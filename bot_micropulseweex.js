@@ -150,7 +150,8 @@ export async function processSymbol(symbol, timeframe) {
   if (!shouldProcess(symbol)) return;
 
   //const candles = await getCandlesFromDB(symbol, timeframe, 120);
-  const candles = await getCandlesFromDB(symbol, timeframe, 25);
+  //const candles = await getCandlesFromDB(symbol, timeframe, 25);
+  let candles = await getCandlesFromDB(symbol, timeframe, 25);
   if (!candles || candles.length < 20) return;
 
   candles.sort((a, b) => a.timestamp - b.timestamp);
