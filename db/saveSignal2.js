@@ -2,6 +2,8 @@
 
 import { client } from "./client.js";
 import { splitSpainDate } from "../core/utils.js";
+import { fmt } from "../core/activeCryptos.js";
+
 //import { sendTelegram } from "../telegram/send.js";
 
 export async function saveSignal2({
@@ -26,6 +28,11 @@ export async function saveSignal2({
   const createdAt = Date.now();
 
   const { date_es, hora_es, timestamp_es } = splitSpainDate(tsMs);
+  entry  = fmt(entry,  symbol);
+  entryr = fmt(entryr, symbol);
+  tp     = fmt(tp,     symbol);
+  sl     = fmt(sl,     symbol);
+
 
   await client.query(
     `
