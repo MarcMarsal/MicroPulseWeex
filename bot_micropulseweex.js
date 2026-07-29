@@ -155,6 +155,18 @@ export async function processSymbol(symbol, timeframe) {
 
   candles.sort((a, b) => a.timestamp - b.timestamp);
 
+  // NORMALITZACIÓ PEPE (una sola vegada, per tot el bot)
+  if (symbol === "PEPE-USDT") {
+    const k = 1000;
+    candles = candles.map(c => ({
+      ...c,
+      open:  c.open  * k,
+      high:  c.high  * k,
+      low:   c.low   * k,
+      close: c.close * k
+    }));
+  }
+
   const atrManual = calcATRManualSeries(candles, 10);
   if (!atrManual || atrManual.every(v => v === null)) return;
 
