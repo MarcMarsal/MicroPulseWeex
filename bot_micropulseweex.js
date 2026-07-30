@@ -18,7 +18,9 @@ function shouldProcess(symbol) {
 // -------------------------------------------------------------
 function applyMicroPulseFilters(candles, candleIndex, atrManual, type, timeframe) {
   const atr = atrManual[candleIndex];
-  if (!atr || candleIndex - 20 < 0) {
+  const slopeLen = timeframe === "15m" ? 40 : 20;
+  //if (!atr || candleIndex - 20 < 0) {
+  if (!atr || candleIndex - slopeLen < 0) {
     return {
       isGood: false,
       slope: null,
@@ -28,7 +30,7 @@ function applyMicroPulseFilters(candles, candleIndex, atrManual, type, timeframe
   }
 
   //const slopeLen = 20;
-  const slopeLen = timeframe === "15m" ? 40 : 20;
+ 
 
   const slope = candles[candleIndex].close - candles[candleIndex - slopeLen].close;
   const slopeOk = Math.abs(slope) < atr * 3.5;
