@@ -5,6 +5,37 @@ import { client } from "../db/client.js";
 const API_WEEX    = process.env.API_WEEX;
 
 // -------------------------------------------------------------
+// PATCH INTEGRAT WEEX — neteja duplicats, snapshots incompletes i valors buits
+// -------------------------------------------------------------
+function fixWeexCandles(candles) {
+
+  // 1) Deduplicar per timestamp
+  candles = candles.filter((c, i, arr) =>
+    i === arr.findIndex(t => t.timestamp === c.timestamp)
+  );
+
+  // 2) Ignorar veles incompletes (pre-close)
+  candles = candles.filter(c =>
+    c.open !== "" &&
+    c.close !== "" &&
+    c.high !== "" &&
+    c.low !== ""
+  );
+
+  // 3) Validar format i corregir valors buits
+  candles = candles.map(c => ({
+    timestamp: Number(c.timestamp),
+    open: parseFloat(c.open || c.close),
+    high: parseFloat(c.high || c.open),
+    low: parseFloat(c.low || c.open),
+    close: parseFloat(c.close || c.open),
+    volume: parseFloat(c.volume || 0)
+  }));
+
+  return candles;
+}
+
+// -------------------------------------------------------------
 // NORMALITZAR TIMESTAMP
 // -------------------------------------------------------------
 function normalizeTimestamp_WEEX(raw) {
@@ -104,28 +135,38 @@ async function fetchWeex(symbol, timeframe) {
     const sym = normalizeSymbolFor("WEEX", symbol);
     const tf  = normalizeTimeframeFor("WEEX", timeframe);
 
-    //const url = `${API_WEEX}?symbol=${sym}&interval=${tf}&limit=100`;
     const url = `${API_WEEX}?symbol=${sym}&interval=${tf}&limit=5`;
    
-    const res = await axios.get(url, {headers: {"User-Agent": "Mozilla/5.0","Accept": "application/json"}});
+    const res = await axios.get(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "application/json"
+      }
+    });
 
     const data = res.data;
   
     if (!data || data.length === 0) return [];
-   
-    return data.map(k => {
-      const ts = normalizeTimestamp_WEEX(k[0]); // timestamp
+
+    // Convertir a format intern
+    let candles = data.map(k => {
+      const ts = normalizeTimestamp_WEEX(k[0]);
       if (!ts) return null;
-    
+
       return toInternal(
         ts,
-        parseFloat(k[1]), // open
-        parseFloat(k[2]), // high
-        parseFloat(k[3]), // low
-        parseFloat(k[4]), // close
-        parseFloat(k[5])  // volume
+        parseFloat(k[1]),
+        parseFloat(k[2]),
+        parseFloat(k[3]),
+        parseFloat(k[4]),
+        parseFloat(k[5])
       );
     }).filter(Boolean);
+
+    // 🔥 Aplicar patch FIAT aquí
+    candles = fixWeexCandles(candles);
+
+    return candles;
 
   } catch (err) {
     console.log("❌ Error WEEX:", symbol, timeframe, err.message);
@@ -134,12 +175,10 @@ async function fetchWeex(symbol, timeframe) {
 }
 
 // -------------------------------------------------------------
-// FETCH + STORE (OKX → candles, WEEX → candles_weex, BITUNIX → candles_bitunix)
+// FETCH + STORE
 // -------------------------------------------------------------
 export async function fetchAndStoreCandles(symbol, timeframe) {
   try {
-   
-    // WEEX
     const weex = await fetchWeex(symbol, timeframe);
     for (const c of weex) await storeCandle("candles_weex", symbol, timeframe, c);
 
