@@ -104,7 +104,8 @@ async function fetchWeex(symbol, timeframe) {
     const sym = normalizeSymbolFor("WEEX", symbol);
     const tf  = normalizeTimeframeFor("WEEX", timeframe);
 
-    const url = `${API_WEEX}?symbol=${sym}&interval=${tf}&limit=100`;
+    //const url = `${API_WEEX}?symbol=${sym}&interval=${tf}&limit=100`;
+    const url = `${API_WEEX}?symbol=${sym}&interval=${tf}&limit=5`;
    
     const res = await axios.get(url, {headers: {"User-Agent": "Mozilla/5.0","Accept": "application/json"}});
 
