@@ -7,7 +7,7 @@ export async function getPerformance48h(symbol) {
 
   const res = await client.query(`
     SELECT result
-    FROM signals
+    FROM signals_weex
     WHERE symbol = $1
     AND timestamp >= $2
   `, [symbol, since]);
