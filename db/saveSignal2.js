@@ -93,7 +93,9 @@ export async function saveSignal2({
       isGood,
       slope,
       wicksBoth,
-      rsi
+      rsi,
+      tps48h,
+      percent48h
     ]
   );
 
