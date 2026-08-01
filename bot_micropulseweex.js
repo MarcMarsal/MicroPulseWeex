@@ -8,6 +8,7 @@ import { detectMSES } from "./core/patterns.js";
 import { fetchAndStoreCandles } from "./core/fetchcandles.js";
 import { calculateRSI } from "./core/rsi.js";
 import { ACTIVE_CRYPTO_LIST, UNIVERSE } from "./core/activeCryptos.js";
+import { getPerformance48h } from "./core/stats.js";
 
 function shouldProcess(symbol) {
   return ACTIVE_CRYPTO_LIST.includes(symbol);
@@ -236,6 +237,10 @@ export async function processSymbol(symbol, timeframe) {
     const closes = q.rows.map(r => Number(r.close)).reverse();
     sig.rsi = calculateRSI(closes);
 
+    const perf = await getPerformance48h(symbol);
+    sig.tps48h = perf.tps;
+    sig.percent48h = perf.percent;
+    
     // -------------------------------------------------------------
     // GUARDAR SENYAL
     // -------------------------------------------------------------
@@ -252,7 +257,10 @@ export async function processSymbol(symbol, timeframe) {
       isGood:   sig.isGood,
       slope:    sig.slope,
       wicksBoth:sig.wicksBoth,
-      rsi:      sig.rsi
+      rsi:      sig.rsi,
+       // 🔥 nous camps del panell
+      tps48h:     sig.tps48h,
+      percent48h: sig.percent48h
     });
   }
 }
