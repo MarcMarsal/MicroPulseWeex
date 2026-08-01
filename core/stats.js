@@ -15,7 +15,7 @@ export async function getPerformance48h(symbol, timeframe) {
           / COUNT(*)::decimal) * 100
         )
       END AS percent48h
-    FROM signals_upgraded
+    FROM signals_weex
     WHERE symbol = $1
     AND timeframe = $2
     AND timestamp >= (EXTRACT(EPOCH FROM NOW()) * 1000 - 48 * 60 * 60 * 1000);
