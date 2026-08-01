@@ -21,7 +21,9 @@ export async function saveSignal2({
   slope,
   wicksBoth,
 
-  rsi
+  rsi,
+  tps48h,
+  percent48h
 }) {
 
   const tsMs = Number(timestamp);
@@ -55,7 +57,9 @@ export async function saveSignal2({
       is_good,
       slope,
       wicks_both,
-      rsi
+      rsi,
+      tps48h,
+      percent48h
     )
     VALUES (
       $1,$2,$3,
@@ -66,7 +70,8 @@ export async function saveSignal2({
       $14,
       false,
       $15,$16,$17,
-      $18
+      $18,
+      $19,$20
     )
     ON CONFLICT DO NOTHING
     `,
