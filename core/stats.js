@@ -6,10 +6,20 @@ export async function getPerformance48h(symbol) {
   const since = Date.now() - 48 * 60 * 60 * 1000;
 
   const res = await client.query(`
-    SELECT result
-    FROM signals_weex
-    WHERE symbol = $1
-    AND timestamp >= $2
+   SELECT
+    COUNT(*) FILTER (WHERE result = 'TP') AS tps48h,
+    COUNT(*) FILTER (WHERE result = 'SL') AS sls48h,
+    CASE 
+        WHEN COUNT(*) = 0 THEN 0
+        ELSE ROUND(
+            (COUNT(*) FILTER (WHERE result = 'TP')::decimal 
+            / COUNT(*)::decimal) * 100
+        )
+    END AS percent48h
+FROM signals_upgraded
+WHERE symbol = $1
+AND timestamp >= (EXTRACT(EPOCH FROM NOW()) * 1000 - 48 * 60 * 60 * 1000);
+
   `, [symbol, since]);
 
   let tps = 0;
