@@ -237,7 +237,7 @@ export async function processSymbol(symbol, timeframe) {
     const closes = q.rows.map(r => Number(r.close)).reverse();
     sig.rsi = calculateRSI(closes);
 
-    const perf = await getPerformance48h(symbol);
+    const perf = await getPerformance48h(symbol,timeframe);
     sig.tps48h = perf.tps;
     sig.percent48h = perf.percent;
     
