@@ -1,6 +1,6 @@
 // stats.js Micro Pulse Weex
 
-import { client } from "./db/client.js";
+import { client } from "../db/client.js";
 
 export async function getPerformance48h(symbol) {
   const since = Date.now() - 48 * 60 * 60 * 1000;
