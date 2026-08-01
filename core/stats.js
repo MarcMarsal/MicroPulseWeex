@@ -3,7 +3,7 @@
 import { client } from "../db/client.js";
 
 export async function getPerformance48h(symbol) {
-  const since = Date.now() - 48 * 60 * 60 * 1000;
+  //const since = Date.now() - 48 * 60 * 60 * 1000;
 
   const res = await client.query(`
    SELECT
@@ -20,7 +20,8 @@ FROM signals_upgraded
 WHERE symbol = $1
 AND timestamp >= (EXTRACT(EPOCH FROM NOW()) * 1000 - 48 * 60 * 60 * 1000);
 
-  `, [symbol, since]);
+ 
+  `, [symbol]);
 
   let tps = 0;
   let sls = 0;
