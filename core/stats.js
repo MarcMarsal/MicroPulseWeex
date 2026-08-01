@@ -2,7 +2,7 @@
 
 import { client } from "../db/client.js";
 
-export async function getPerformance48h(symbol) {
+export async function getPerformance48h(symbol,timeframe) {
   //const since = Date.now() - 48 * 60 * 60 * 1000;
 
   const res = await client.query(`
@@ -18,10 +18,11 @@ export async function getPerformance48h(symbol) {
     END AS percent48h
 FROM signals_upgraded
 WHERE symbol = $1
+AND timeframe =$2
 AND timestamp >= (EXTRACT(EPOCH FROM NOW()) * 1000 - 48 * 60 * 60 * 1000);
 
  
-  `, [symbol]);
+  `, [symbol,timeframe]);
 
   let tps = 0;
   let sls = 0;
