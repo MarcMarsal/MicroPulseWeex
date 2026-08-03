@@ -2,37 +2,40 @@ import axios from "axios";
 import { client } from "../db/client.js";
 
 // Variables d'entorn
-const API_WEEX    = process.env.API_WEEX;
+const API_WEEX = process.env.API_WEEX;
 
 // -------------------------------------------------------------
 // PATCH INTEGRAT WEEX — neteja duplicats, snapshots incompletes i valors buits
 // -------------------------------------------------------------
 function fixWeexCandles(candles) {
+  const seen = new Set();
+  const clean = [];
 
-  // 1) Deduplicar per timestamp
-  candles = candles.filter((c, i, arr) =>
-    i === arr.findIndex(t => t.timestamp === c.timestamp)
-  );
+  for (const c of candles) {
+    // Dedup O(n)
+    if (seen.has(c.timestamp)) continue;
+    seen.add(c.timestamp);
 
-  // 2) Ignorar veles incompletes (pre-close)
-  candles = candles.filter(c =>
-    c.open !== "" &&
-    c.close !== "" &&
-    c.high !== "" &&
-    c.low !== ""
-  );
+    // Ignorar veles incompletes
+    if (
+      c.open === "" ||
+      c.close === "" ||
+      c.high === "" ||
+      c.low === ""
+    ) continue;
 
-  // 3) Validar format i corregir valors buits
-  candles = candles.map(c => ({
-    timestamp: Number(c.timestamp),
-    open: parseFloat(c.open || c.close),
-    high: parseFloat(c.high || c.open),
-    low: parseFloat(c.low || c.open),
-    close: parseFloat(c.close || c.open),
-    volume: parseFloat(c.volume || 0)
-  }));
+    // Corregir valors buits i parsejar
+    clean.push({
+      timestamp: Number(c.timestamp),
+      open: parseFloat(c.open || c.close),
+      high: parseFloat(c.high || c.open),
+      low: parseFloat(c.low || c.open),
+      close: parseFloat(c.close || c.open),
+      volume: parseFloat(c.volume || 0)
+    });
+  }
 
-  return candles;
+  return clean;
 }
 
 // -------------------------------------------------------------
@@ -135,9 +138,9 @@ async function fetchWeex(symbol, timeframe) {
     const sym = normalizeSymbolFor("WEEX", symbol);
     const tf  = normalizeTimeframeFor("WEEX", timeframe);
 
+    // LIMIT 5 → consum mínim
     const url = `${API_WEEX}?symbol=${sym}&interval=${tf}&limit=5`;
-    //const url = `${API_WEEX}?symbol=${sym}&interval=${tf}&limit=100`;
-   
+
     const res = await axios.get(url, {
       headers: {
         "User-Agent": "Mozilla/5.0",
@@ -146,7 +149,6 @@ async function fetchWeex(symbol, timeframe) {
     });
 
     const data = res.data;
-  
     if (!data || data.length === 0) return [];
 
     // Convertir a format intern
@@ -164,7 +166,7 @@ async function fetchWeex(symbol, timeframe) {
       );
     }).filter(Boolean);
 
-    // 🔥 Aplicar patch FIAT aquí
+    // 🔥 Aplicar patch FIAT optimitzat
     candles = fixWeexCandles(candles);
 
     return candles;
@@ -181,7 +183,13 @@ async function fetchWeex(symbol, timeframe) {
 export async function fetchAndStoreCandles(symbol, timeframe) {
   try {
     const weex = await fetchWeex(symbol, timeframe);
-    for (const c of weex) await storeCandle("candles_weex", symbol, timeframe, c);
+
+    // Guardar en paral·lel → consum mínim
+    await Promise.all(
+      weex.map(c =>
+        storeCandle("candles_weex", symbol, timeframe, c)
+      )
+    );
 
   } catch (err) {
     console.log("❌ Error general descarregant veles:", symbol, timeframe, err.message);
