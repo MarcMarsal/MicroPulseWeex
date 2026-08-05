@@ -139,8 +139,8 @@ async function fetchWeex(symbol, timeframe) {
     const tf  = normalizeTimeframeFor("WEEX", timeframe);
 
     // LIMIT 5 → consum mínim
-    //const url = `${API_WEEX}?symbol=${sym}&interval=${tf}&limit=5`;
-    const url = `${API_WEEX}?symbol=${sym}&interval=${tf}&limit=50`;
+    const url = `${API_WEEX}?symbol=${sym}&interval=${tf}&limit=5`;
+    //const url = `${API_WEEX}?symbol=${sym}&interval=${tf}&limit=50`;
 
 
     const res = await axios.get(url, {
