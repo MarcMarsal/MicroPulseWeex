@@ -1,10 +1,10 @@
 // core/activeCryptos.js — MicroPulse
 
 export const ACTIVE_CRYPTO_LIST = [
-  "APT-USDT","ARB-USDT","ASTER-USDT","ATOM-USDT","AVAX-USDT",
-  "BCH-USDT","DOT-USDT","FET-USDT","HBAR-USDT","LTC-USDT",
+  "APT-USDT","ASTER-USDT","ATOM-USDT","AVAX-USDT",
+  "DOT-USDT","FET-USDT","HBAR-USDT","LTC-USDT",
   "OP-USDT","PEPE-USDT","SEI-USDT","SUI-USDT","TRUMP-USDT",
-  "VIRTUAL-USDT","XRP-USDT"
+  "ADA-USDT","SOL-USDT","NEAR-USDT","RENDER-USDT","ONDO-USDT","LINK-USDT",
 ];
 
 
@@ -13,7 +13,7 @@ export const UNIVERSE = [
   "RENDER-USDT","XRP-USDT","ARB-USDT","ATOM-USDT","BNB-USDT","DOT-USDT",
   "ETH-USDT","INJ-USDT","PEPE-USDT","TRUMP-USDT","ADA-USDT","ASTER-USDT",
   "AVAX-USDT","BCH-USDT","HBAR-USDT","NEAR-USDT","SEI-USDT","SUI-USDT",
-  "VIRTUAL-USDT","LTC-USDT"
+  "VIRTUAL-USDT","LTC-USDT","ONDO-USDT"
 ];
 
 // -------------------------------------------------------------
@@ -38,8 +38,9 @@ export const DECIMALS = {
   "INJ-USDT": 3,
   "LINK-USDT": 3,
   "LTC-USDT": 2,
+  "ONDO-USDT":4,
   "OP-USDT": 4,
-   
+ 
   "PEPE-USDT": 7,
    
   
