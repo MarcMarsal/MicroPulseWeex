@@ -144,11 +144,8 @@ async function fetchWeex(symbol, timeframe) {
     const data = res.data;
     if (!data || data.length === 0) return [];
 
-    // 🔥🔥 TALLAR ABANS DE PROCESSAR — només les 5 últimes veles
-    const raw = data.slice(-5);
-
-    // Convertir a format intern
-    let candles = raw.map(k => {
+    // Convertir a format intern (totes les veles)
+    let candles = data.map(k => {
       const ts = normalizeTimestamp_WEEX(k[0]);
       if (!ts) return null;
 
@@ -164,6 +161,10 @@ async function fetchWeex(symbol, timeframe) {
 
     // 🔥 Neteja FIAT
     candles = fixWeexCandles(candles);
+
+    // 🔥🔥 TALLAR DESPRÉS — manté la vela oberta
+    const MAX_CANDLES = 200;
+    candles = candles.slice(-MAX_CANDLES);
 
     return candles;
 
