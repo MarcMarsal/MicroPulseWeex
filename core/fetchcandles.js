@@ -12,11 +12,9 @@ function fixWeexCandles(candles) {
   const clean = [];
 
   for (const c of candles) {
-    // Dedup O(n)
     if (seen.has(c.timestamp)) continue;
     seen.add(c.timestamp);
 
-    // Ignorar veles incompletes
     if (
       c.open === "" ||
       c.close === "" ||
@@ -24,7 +22,6 @@ function fixWeexCandles(candles) {
       c.low === ""
     ) continue;
 
-    // Corregir valors buits i parsejar
     clean.push({
       timestamp: Number(c.timestamp),
       open: parseFloat(c.open || c.close),
@@ -47,10 +44,7 @@ function normalizeTimestamp_WEEX(raw) {
   const ts = Number(raw);
   if (!Number.isFinite(ts)) return null;
 
-  // Si és en segons (10 dígits), convertir a ms
   if (ts < 1000000000000) return ts * 1000;
-
-  // Si és en ms (13 dígits), acceptar-lo
   if (ts >= 1600000000000) return ts;
 
   return null;
@@ -60,16 +54,16 @@ function normalizeTimestamp_WEEX(raw) {
 // NORMALITZAR SYMBOL PER EXCHANGE
 // -------------------------------------------------------------
 function normalizeSymbolFor(exchange, symbol) {
-  if (exchange === "OKX") return symbol;       // BTC-USDT
-  return symbol.replace("-", "");              // BTCUSDT
+  if (exchange === "OKX") return symbol;
+  return symbol.replace("-", "");
 }
 
 // -------------------------------------------------------------
 // NORMALITZAR TIMEFRAME PER EXCHANGE
 // -------------------------------------------------------------
 function normalizeTimeframeFor(exchange, timeframe) {
-  if (exchange === "OKX") return timeframe;    // 1H
-  return timeframe.toLowerCase();              // 1h
+  if (exchange === "OKX") return timeframe;
+  return timeframe.toLowerCase();
 }
 
 // -------------------------------------------------------------
@@ -138,10 +132,7 @@ async function fetchWeex(symbol, timeframe) {
     const sym = normalizeSymbolFor("WEEX", symbol);
     const tf  = normalizeTimeframeFor("WEEX", timeframe);
 
-    // LIMIT 5 → consum mínim
     const url = `${API_WEEX}?symbol=${sym}&interval=${tf}&limit=5`;
-    //const url = `${API_WEEX}?symbol=${sym}&interval=${tf}&limit=50`;
-
 
     const res = await axios.get(url, {
       headers: {
@@ -153,8 +144,11 @@ async function fetchWeex(symbol, timeframe) {
     const data = res.data;
     if (!data || data.length === 0) return [];
 
+    // 🔥🔥 TALLAR ABANS DE PROCESSAR — només les 5 últimes veles
+    const raw = data.slice(-5);
+
     // Convertir a format intern
-    let candles = data.map(k => {
+    let candles = raw.map(k => {
       const ts = normalizeTimestamp_WEEX(k[0]);
       if (!ts) return null;
 
@@ -168,7 +162,7 @@ async function fetchWeex(symbol, timeframe) {
       );
     }).filter(Boolean);
 
-    // 🔥 Aplicar patch FIAT optimitzat
+    // 🔥 Neteja FIAT
     candles = fixWeexCandles(candles);
 
     return candles;
@@ -186,7 +180,6 @@ export async function fetchAndStoreCandles(symbol, timeframe) {
   try {
     const weex = await fetchWeex(symbol, timeframe);
 
-    // Guardar en paral·lel → consum mínim
     await Promise.all(
       weex.map(c =>
         storeCandle("candles_weex", symbol, timeframe, c)
