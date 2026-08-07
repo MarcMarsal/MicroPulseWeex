@@ -140,7 +140,7 @@ function calcATRManualSeries(candles, atrLen = 10) {
 // TP/SL MICRO‑PULSE (abans FIAT‑PRO)
 // -------------------------------------------------------------
 function tpSlMicroPulse(isLong, entry, atr) {
-  const tpMult = 0.4;
+  const tpMult = 0.5;
   const slMult = 1.0;
 
   const tp = isLong ? entry + atr * tpMult : entry - atr * tpMult;
